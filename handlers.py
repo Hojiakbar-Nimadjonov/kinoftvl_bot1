@@ -26,20 +26,30 @@ class Handlers:
         """Проверка подписки на каналы"""
         user_id = update.effective_user.id
         
+        print(f"🔍 Проверяем подписку для пользователя {user_id}")
+        
         try:
             # Проверяем подписку на каждый канал
             for channel in CHANNELS:
+                print(f"📺 Проверяем канал: {channel['name']} (ID: {channel['id']})")
+                
                 member = await context.bot.get_chat_member(channel["id"], user_id)
+                print(f"   Статус пользователя: {member.status}")
+                
                 if member.status in ['left', 'kicked']:
+                    print(f"   ❌ Пользователь НЕ подписан на {channel['name']}")
                     db.update_subscription_status(user_id, False)
                     return False
+                else:
+                    print(f"   ✅ Пользователь подписан на {channel['name']}")
             
             # Если подписан на все каналы
+            print(f"✅ Пользователь {user_id} подписан на все каналы")
             db.update_subscription_status(user_id, True)
             return True
             
         except Exception as e:
-            print(f"Ошибка при проверке подписки: {e}")
+            print(f"❌ Ошибка при проверке подписки: {e}")
             return False
     
     @staticmethod
