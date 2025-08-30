@@ -126,22 +126,35 @@ class Handlers:
         user_id = update.effective_user.id
         code = update.message.text
         
-        film = db.get_film_by_code(code)
+        print(f"🔍 Поиск фильма: {code} для пользователя {user_id}")
         
-        if film:
-            # Фиксируем просмотр
-            db.add_view(user_id, film['id'])
+        try:
+            film = db.get_film_by_code(code)
+            print(f"📽️ Результат поиска: {film}")
             
-            # Отправляем информацию о фильме
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=film['cover'],
-                caption=f"🎬 {film['title']}\n\n🔗 Ссылка: {film['link']}"
-            )
-        else:
+            if film:
+                # Фиксируем просмотр
+                db.add_view(user_id, film['id'])
+                print(f"✅ Просмотр зафиксирован для фильма {film['id']}")
+                
+                # Отправляем информацию о фильме
+                await context.bot.send_photo(
+                    chat_id=update.effective_chat.id,
+                    photo=film['cover'],
+                    caption=f"🎬 {film['title']}\n\n🔗 Ссылка: {film['link']}"
+                )
+                print(f"✅ Фильм отправлен пользователю {user_id}")
+            else:
+                await update.message.reply_text(
+                    f"❌ Фильм с кодом {code} не найден.\n"
+                    "Проверьте правильность кода или обратитесь к администратору."
+                )
+                print(f"❌ Фильм {code} не найден")
+                
+        except Exception as e:
+            print(f"❌ Ошибка при поиске фильма {code}: {e}")
             await update.message.reply_text(
-                f"❌ Фильм с кодом {code} не найден.\n"
-                "Проверьте правильность кода или обратитесь к администратору."
+                f"❌ Произошла ошибка при поиске фильма {code}. Попробуйте позже."
             )
     
     @staticmethod
