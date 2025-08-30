@@ -1,15 +1,18 @@
+#!/usr/bin/env python3
+"""
+Простой тестовый бот для отладки поиска
+"""
+
 import asyncio
 import logging
-import sys
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from config import BOT_TOKEN
 from database import Database
 
-# Настройка логирования для Railway
+# Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO,
-    stream=sys.stdout
+    level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
@@ -18,7 +21,7 @@ db = Database()
 
 async def start(update, context):
     """Обработчик команды /start"""
-    await update.message.reply_text("Привет! Я бот для поиска фильмов. Отправь мне код фильма (например: #123)")
+    await update.message.reply_text("Привет! Я тестовый бот. Отправь мне код фильма (например: #123)")
 
 async def handle_text(update, context):
     """Обработчик текстовых сообщений"""
@@ -59,55 +62,24 @@ async def handle_text(update, context):
         await update.message.reply_text("Отправь код фильма, начиная с # (например: #123)")
 
 async def main():
-    """Основная функция для Railway"""
-    try:
-        # Создаем приложение
-        application = Application.builder().token(BOT_TOKEN).build()
-        
-        # Добавляем обработчики
-        application.add_handler(CommandHandler("start", start))
-        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-        
-        # Запускаем бота в polling режиме для Railway Worker
-        logger.info("Бот запускается на Railway Worker...")
-        await application.initialize()
-        await application.start()
-        await application.updater.start_polling()
-        
-        logger.info("Бот успешно запущен и работает в polling режиме")
-        
-        # Ждем сигнала остановки
-        try:
-            while True:
-                await asyncio.sleep(1)
-        except KeyboardInterrupt:
-            logger.info("Получен сигнал остановки")
-        finally:
-            await application.updater.stop()
-            await application.stop()
-            await application.shutdown()
-            
-    except Exception as e:
-        logger.error(f"Критическая ошибка при запуске бота: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
+    """Основная функция"""
+    # Создаем приложение
+    application = Application.builder().token(BOT_TOKEN).build()
+    
+    # Добавляем обработчики
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    
+    # Запускаем бота
+    logger.info("Тестовый бот запускается...")
+    await application.run_polling()
 
 if __name__ == '__main__':
     try:
-        # Создаем новый event loop
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(main())
+        asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Бот остановлен пользователем")
+        logger.info("Бот остановлен")
     except Exception as e:
-        logger.error(f"Ошибка при запуске бота: {e}")
+        logger.error(f"Ошибка: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
-    finally:
-        try:
-            loop.close()
-        except:
-            pass
