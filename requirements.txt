@@ -1,3 +1,2 @@
-# Updated requirements.txt - sqlite3 removed (built-in module)
 python-telegram-bot==20.7
 python-dotenv==1.0.0
