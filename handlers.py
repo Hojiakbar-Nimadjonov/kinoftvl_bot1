@@ -112,6 +112,8 @@ class Handlers:
         user_id = update.effective_user.id
         text = update.message.text
         
+        print(f"📨 Получено сообщение: '{text}' от пользователя {user_id}")
+        
         # Сначала проверяем, не является ли это админским сообщением
         if user_id == ADMIN_ID and 'admin_action' in context.user_data:
             await Handlers.handle_admin_text(update, context)
@@ -124,8 +126,10 @@ class Handlers:
         
         # Проверяем, является ли сообщение кодом фильма
         if text.startswith('#'):
+            print(f"🔍 Начинаем поиск фильма: {text}")
             await Handlers.search_film_by_code(update, context, text)
         else:
+            print(f"❌ Сообщение не является кодом фильма")
             await update.message.reply_text(
                 "Введите код фильма, начиная с символа # (например: #123)"
             )
