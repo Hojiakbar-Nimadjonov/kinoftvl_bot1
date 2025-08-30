@@ -107,10 +107,10 @@ class Handlers:
             await Handlers.handle_admin_text(update, context)
             return
         
-        # Временно отключаем проверку подписки для тестирования
-        # if not await Handlers.check_subscription(update, context):
-        #     await Handlers.show_subscription_request(update, context)
-        #     return
+        # Проверяем подписку
+        if not await Handlers.check_subscription(update, context):
+            await Handlers.show_subscription_request(update, context)
+            return
         
         # Проверяем, является ли сообщение кодом фильма
         if text.startswith('#'):
